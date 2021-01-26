@@ -1,0 +1,104 @@
+{% extends "todoApp/layout.html" %}
+
+{% block title %} To Do {% endblock %}
+
+{% block body %} 
+    <div>
+        <h1>To Do<a class="btn btn-sm btn-outline-primary" style = "float:right; margin-top: 10px;" href="{% url 'logout' %}">Log Out</a></h1>
+    </div>
+    
+    <hr>
+    
+        {% for task in tasks %}
+            <div class = "taskX">
+              <div>
+                <input type = "checkbox" name = "Task" class = "check" value = "" id = {{task.id}}>
+                <label for = "Task">{{task.description}}</label>
+              </div>
+            </div>
+        {% empty %}
+            No tasks pending.
+        {% endfor %}
+    
+    <hr>
+    <!-- Trigger the modal with a button -->
+  <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Add task</button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Add a task</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form role="form" method="POST" action="{% url 'addTask' %}">
+            <div class="form-group">
+                <div>
+                    <input type="text" class="form-control input-lg" name="task" value="">
+                </div>
+            </div>
+            <div class="form-group">
+                <div>
+                    <button type="submit" class="btn btn-success">Add</button>
+                </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <div class = "Toggle">
+    Theme:
+    <label class="switch">
+      <input type="checkbox" checked onclick="darkMode()">
+      <span class="slider round"></span>
+    </label>
+  </div>
+  <script>
+      var count = 0;
+      function darkMode() {
+        var element = document.querySelector("#themeLink");
+        
+        console.log(typeof element.value);
+        if (count%2 === 0)
+        {
+            element.href = "/static/todoApp/lightMode.css";
+            count++;
+        }
+        else
+        {
+            element.href = "/static/todoApp/styles.css";
+            count++;
+        }
+      }
+      document.addEventListener('click', event => {
+
+          // Find what was clicked on
+          const element = event.target;
+          
+          // Check if the user clicked on a hide button
+          if (element.className === 'check') {
+             
+            setTimeout(function(){  
+              element.parentElement.parentElement.style.animationPlayState = 'running';
+            }, 500);
+             
+            fetch('/delete', {
+                method: 'POST',
+                body: JSON.stringify({
+                    "id": element.id
+                })
+              }) 
+          }
+
+      });
+      
+
+  </script>
+{% endblock %}
